@@ -18,5 +18,5 @@ module.exports = {
   async down (queryInterface, Sequelize) {
     
     await queryInterface.removeColumn("comments", "UserId"); //posts are linked with userId
-  }
+  },
 };
