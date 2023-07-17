@@ -1,0 +1,49 @@
+https://github.com/CSI-Tech-Talent-Pipeline/Summer-2023-preinternship/tree/main/day21-node-and-express-pt-4-database-relationships
+one to many: In a one-to-many relationship, each record in one table can be associated with one or more records in another table.
+Implementing a One-to-Many Relationship
+Our first example relates to the relationship between Users and JobApplications. A single User can have multiple JobApplications, which translates to a One-to-Many relationship between these two entities.
+
+Here's how we can define this in Sequelize:
+// models/user.js
+const { Model } = require("sequelize");
+module.exports = (sequelize, DataTypes) => {
+  class User extends Model {
+    static associate(models) {
+      this.hasMany(models.JobApplication);
+    }
+  }
+  User.init(
+    {
+      name: DataTypes.STRING,
+      email: DataTypes.STRING,
+      // ...
+    },
+    {
+      sequelize,
+      modelName: "User",
+      tableName: "users",
+    }
+  );
+  return User;
+};
+// models/jobApplication.js
+const { Model } = require("sequelize");
+module.exports = (sequelize, DataTypes) => {
+  class JobApplication extends Model {
+    static associate(models) {
+      this.belongsTo(models.User);
+    }
+  }
+  JobApplication.init(
+    {
+      // Field definitions go here...
+    },
+    {
+      sequelize,
+      modelName: "JobApplication",
+      tableName: "job_applications",
+    }
+  );
+  return JobApplication;
+};
+
