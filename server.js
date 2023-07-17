@@ -12,12 +12,12 @@ app.use(
       resave: false,
       saveUninitialized: false,
       cookie: {
-        maxAge: 3600000, // 1 hour
+        maxAge: 3600000, 
       },
     })
   );
-
-  const authenticateUser = (req, res, next) => {
+//---------------------------------authenticate user
+const authenticateUser = (req, res, next) => {
     //if not logged in
     if (!req.session.userId) {
       return res

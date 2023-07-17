@@ -34,7 +34,7 @@ module.exports = {
       {}
     );
     const posts = await queryInterface.sequelize.query(`SELECT id FROM posts`);
-   const postId = posts[0][0].id;
+    const postId = posts[0][0].id;
       //comments
     await queryInterface.bulkInsert(
       "comments",

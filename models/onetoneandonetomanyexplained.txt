@@ -47,3 +47,4 @@ module.exports = (sequelize, DataTypes) => {
   return JobApplication;
 };
 
+npx sequelize-cli db:migrate //migrate
