@@ -3,10 +3,9 @@ const app = express();
 const port = 6000;
 const bcrypt = require("bcryptjs");
 const session = require("express-session");
-app.use(express.json());
 const { Post, Comment, User } = require("./models");
 require("dotenv").config();
-
+app.use(express.json());
 app.use(
     session({
       secret: process.env.SESSION_SECRET,
@@ -239,6 +238,38 @@ app.delete("/comments/:id", authenticateUser, async (req, res) => {
     }
   });
   //------------------------------login details-------------------------------------------
+  //signUp
+  app.post("/signup", async (req, res) => {
+    const hashedPass = await bcrypt.hash(req.body.password, 10);
+  
+    try {
+      const user = await User.create({
+        name: req.body.name,
+        email: req.body.email,
+        password: hashedPass,
+      });
+      req.session.userId = user.id;
+      // Send a response to the client informing them that the user was successfully created
+      res.status(201).json({
+        message: "User created!",
+        user: {
+          name: user.name,
+          email: user.email,
+        },
+      });
+    } catch (error) {
+      if (error.name === "SequelizeValidationError") {
+        return res
+          .status(422)
+          .json({ errors: error.errors.map((e) => e.message) });
+      }
+      res.status(500).json({
+        message: "Error occurred while creating user",
+        error: error,
+      });
+    }
+  });
+  //login using credentials
   app.post("/login", async (req, res) => {
     try {
       // find user by email
@@ -254,8 +285,7 @@ app.delete("/comments/:id", authenticateUser, async (req, res) => {
       // if user found, use bcrypt to check if password matches hashed password
       bcrypt.compare(req.body.password, user.password, (error, result) => {
         if (result) {
-          // Passwords match
-          // TODO: Create a session for this user
+          // Passwords match, create session
           req.session.userId = user.id;
           res.status(200).json({
             message: "Logged in successfully",
@@ -275,7 +305,7 @@ app.delete("/comments/:id", authenticateUser, async (req, res) => {
         .json({ message: "An error occurred during the login process" });
     }
   });
-
+//logout (destroy session)
   app.delete("/logout", (req, res) => {
   req.session.destroy((err) => {
     if (err) {
@@ -286,6 +316,7 @@ app.delete("/comments/:id", authenticateUser, async (req, res) => {
     return res.sendStatus(200);
   });
 });
+
 //----------------------------------------------------------
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
