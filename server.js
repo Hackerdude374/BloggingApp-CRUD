@@ -46,9 +46,9 @@ app.get("/posts", authenticateUser, async (req, res) => {
 app.get("/posts/:id", authenticateUser, async (req, res) => {
     const postId = parseInt(req.params.id, 10);
   try {
-      const Post = await Post.findOne({ where: { id: postId } });
-    if (Post) {
-        res.status(200).json(Post);
+      const Post1 = await Post.findOne({ where: { id: postId } });
+    if (Post1) {
+        res.status(200).json(Post1);
       } else {
         res.status(404).send({ message: "error: Post not found" });
       }
