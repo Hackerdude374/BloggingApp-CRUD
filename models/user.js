@@ -15,11 +15,16 @@ module.exports = (sequelize, DataTypes) => {
     {
       title: DataTypes.STRING,
       description: DataTypes.STRING,
+      //day 22
+      password: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
     },
     {
       sequelize,
       modelName: "User",
-      tableName: "user",
+      tableName: "users",
     }
   );
   return User;
