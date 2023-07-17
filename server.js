@@ -75,20 +75,50 @@ app.post("/posts", authenticateUser, async (req, res) => {
       res.status(500).send({ message: err.message });
     }
   });
-
-  // Delete a specific Post
-app.delete("/posts/:id", authenticateUser, async (req, res) => {
-    const blogId = parseInt(req.params.id, 10);
+// Update specific post
+app.patch("/posts/:id", authenticateUser, async (req, res) => {
+    const postId = parseInt(req.params.id, 10);
   
     try {
-      const record = await Post.findOne({ where: { id: blogId } });
+      const record = await Post.findOne({ where: { id: postId } });
       if (record && record.UserId !== parseInt(req.session.userId, 10)) {
         return res
           .status(403)
           .json({ message: "You are not authorized to perform that action." });
       }
   
-      const deleteOp = await Post.destroy({ where: { id: blogId } });
+      const [numberOfAffectedRows, affectedRows] = await Post.update(req.body, {
+        where: { id: postId },
+        returning: true,
+      });
+  
+      if (numberOfAffectedRows > 0) {
+        res.status(200).json(affectedRows[0]);
+      } else {
+        res.status(404).send({ message: "Post not found" });
+      }
+    } catch (err) {
+      if (err.name === "SequelizeValidationError") {
+        return res.status(422).json({ errors: err.errors.map((e) => e.message) });
+      }
+      console.error(err);
+      res.status(500).send({ message: err.message });
+    }
+  });
+  
+  // Delete a specific Post
+app.delete("/posts/:id", authenticateUser, async (req, res) => {
+    const postId = parseInt(req.params.id, 10);
+  
+    try {
+      const record = await Post.findOne({ where: { id: postId } });
+      if (record && record.UserId !== parseInt(req.session.userId, 10)) {
+        return res
+          .status(403)
+          .json({ message: "You are not authorized to perform that action." });
+      }
+  
+      const deleteOp = await Post.destroy({ where: { id: postId } });
   
       if (deleteOp > 0) {
         res.status(200).send({ message: "Post deleted successfully" });
@@ -236,7 +266,7 @@ app.delete("/comments/:id", authenticateUser, async (req, res) => {
           });
         } else {
           // Passwords don't match
-          res.status(401).json({ message: "Incorrect credentials" });
+          res.status(401).json({ message: "Incorrect password" });
         }
       });
     } catch (error) {
