@@ -16,13 +16,11 @@ app.use(
       },
     })
   );
-//---------------------------------authenticate user
+//---------------------------------authenticate user------------------------
 const authenticateUser = (req, res, next) => {
     //if not logged in
     if (!req.session.userId) {
-      return res
-        .status(401)
-        .json({ message: "You must be logged in to view this page." });
+      return res.status(401).json({ message: "You must be logged in to view this page." });
     }
     next();
   };
@@ -83,7 +81,7 @@ app.patch("/posts/:id", authenticateUser, async (req, res) => {
       if (record && record.UserId !== parseInt(req.session.userId, 10)) {
         return res
           .status(403)
-          .json({ message: "You are not authorized to perform that action." });
+          .json({ message: "You are not authorized to update this post" });
       }
   
       const [numberOfAffectedRows, affectedRows] = await Post.update(req.body, {
@@ -114,7 +112,7 @@ app.delete("/posts/:id", authenticateUser, async (req, res) => {
       if (record && record.UserId !== parseInt(req.session.userId, 10)) {
         return res
           .status(403)
-          .json({ message: "You are not authorized to perform that action." });
+          .json({ message: "You are not authorized to delete this post" });
       }
   
       const deleteOp = await Post.destroy({ where: { id: postId } });
@@ -243,7 +241,7 @@ app.delete("/comments/:id", authenticateUser, async (req, res) => {
     const hashedPass = await bcrypt.hash(req.body.password, 10);
   
     try {
-      const user = await User.create({
+      const user = await User.create({ //json format: name, email, and password
         name: req.body.name,
         email: req.body.email,
         password: hashedPass,
@@ -251,7 +249,7 @@ app.delete("/comments/:id", authenticateUser, async (req, res) => {
       req.session.userId = user.id;
       // Send a response to the client informing them that the user was successfully created
       res.status(201).json({
-        message: "User created!",
+        message: "User created",
         user: {
           name: user.name,
           email: user.email,
@@ -269,7 +267,7 @@ app.delete("/comments/:id", authenticateUser, async (req, res) => {
       });
     }
   });
-  //login using credentials
+  //login using credentials--------------------------------------------- (name email and pass)
   app.post("/login", async (req, res) => {
     try {
       // find user by email
@@ -306,14 +304,15 @@ app.delete("/comments/:id", authenticateUser, async (req, res) => {
     }
   });
 //logout (destroy session)
-  app.delete("/logout", (req, res) => {
+app.delete("/logout", (req, res) => {
   req.session.destroy((err) => {
     if (err) {
-      return res.sendStatus(500);
+      return res.status(500).json({ message: "Logout failed" });
     }
 
     res.clearCookie("connect.sid");
-    return res.sendStatus(200);
+    
+    return res.status(200).json({ message: "Logout successful" });
   });
 });
 
