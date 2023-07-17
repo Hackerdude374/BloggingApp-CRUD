@@ -3,23 +3,22 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class CommentApplication extends Model {
+  class Comment extends Model {
     static associate(models) {
         //a comment belongs to a user and post. use belongsTo for many to One
-      this.belongsTo(models.UserApplication);
-      this.belongsTo(models.PostApplication);
+      this.belongsTo(models.User);
+      this.belongsTo(models.Post);
     }
   }
-  CommentApplication.init(
+  Comment.init(
     {
-      title: DataTypes.STRING,
-      description: DataTypes.STRING,
+      content: DataTypes.STRING,
     },
     {
       sequelize,
-      modelName: "CommentApplication",
-      tableName: "comment_applications",
+      modelName: "Comment",
+      tableName: "comment",
     }
   );
-  return CommentApplication;
+  return Comment;
 };
