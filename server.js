@@ -60,18 +60,27 @@ app.get("/posts/:id", authenticateUser, async (req, res) => {
 
 // Create new post
 app.post("/posts", authenticateUser, async (req, res) => {
-    try {
-      const newPost = await Post.create(req.body);
-  
-      res.status(201).json(newPost);
-    } catch (err) {
-      if (err.name === "SequelizeValidationError") {
-        return res.status(422).json({ errors: err.errors.map((e) => e.message) });
-      }
-      console.error(err);
-      res.status(500).send({ message: err.message });
+  try {
+    // Get the user ID from the session
+    const userId = req.session.userId;
+
+    // Create the new post with the UserId set to the user's ID
+    const newPost = await Post.create({
+      title: req.body.title,
+      description: req.body.description,
+      UserId: userId,
+    });
+
+    res.status(201).json(newPost);
+  } catch (err) {
+    if (err.name === "SequelizeValidationError") {
+      return res.status(422).json({ errors: err.errors.map((e) => e.message) });
     }
-  });
+    console.error(err);
+    res.status(500).send({ message: err.message });
+  }
+});
+
 // Update specific post
 app.patch("/posts/:id", authenticateUser, async (req, res) => {
     const postId = parseInt(req.params.id, 10);
