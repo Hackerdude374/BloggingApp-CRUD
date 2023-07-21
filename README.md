@@ -1,6 +1,7 @@
 # blogging-application-using-CRUD
 
-welcome to the blogging application using CRUD.
+Welcome to the blogging application using CRUD.
+
 This repository contains the source code for a Blogging Platform built using the PERN stack. The platform allows users to register, create posts, edit posts, add comments, and perform various CRUD (Create, Read, Update, Delete) operations on posts and comments.
 
 
